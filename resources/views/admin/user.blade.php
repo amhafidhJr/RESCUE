@@ -1,67 +1,136 @@
-<!DOCTYPE html>
-<!--
- @license
- Copyright 2019 Google LLC. All Rights Reserved.
- SPDX-License-Identifier: Apache-2.0
--->
-<!-- [START maps_map_simple] -->
-<html>
-  <head>
-    <title>Simple Map</title>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+@include('includes/header')
+@include('includes/top-nav')
+@include('includes/left-nav')
 
-    <link rel="stylesheet" type="text/css" href="./style.css" />
-    <script type="module" src="./index.js"></script>
-    <style>
-         * SPDX-License-Identifier: Apache-2.0
- */
-/*
- * Always set the map height explicitly to define the size of the div element
- * that contains the map.
- */
-#map {
-  height: 100%;
-}
 
-/*
- * Optional: Makes the sample page fill the window.
- */
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+<main>
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">FisherMen</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item active">FisherMen</li>
+        </ol>
 
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                FisherMen Information
+            </div>
+            <div class="card-body">
+                <table id="datatablesSimple">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone Number</th>
+                            <th>Next of Kin Number</th>
+                            <th>Action</th>
 
-    <!--
-     The `defer` attribute causes the callback to execute after the full HTML
-     document has been parsed. For non-blocking uses, avoiding race conditions,
-     and consistent behavior across browsers, consider loading using Promises
-     with https://www.npmjs.com/package/@googlemaps/js-api-loader.
-    -->
-    <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"
-      defer
-    ></script>
-    <script>
-        let map;
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone Number</th>
+                            <th>Next of Kin Number</th>
+                            <th>Action</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
 
-function initMap() {
-  map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: -34.397, lng: 150.644 },
-    zoom: 8,
-  });
-}
+                        @foreach($fisherManData as $key => $value)
+                        <tr>
+                            <td>{{ $value->name }}</td>
+                            <td>{{ $value->p_number }}</td>
+                            <td>{{ $value->next_of_kin }}</td>
+                            <td>
+                                <input type="text" id="longit" value="{{ $value->longit }}">
+                                <input type="text" id="latit" value="{{ $value->latit }}">
+                            </td>
+                            <td>
+                                <button class="btn btn-warning" type="button"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                                <button class="btn btn-dark" type="button"><i class="fa fa-edit" aria-hidden="true"></i></button>
+                                <button class="btn btn-primary my_location" type="button" data-toggle="modal" data-target="#maps{{$value->fisher_id}}"><i class="fa fa-globe" aria-hidden="true"></i></button>
+                            </td>
+                        </tr>
 
-window.initMap = initMap;
+                        <div id="maps{{ $value->fisher_id }}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="my-modal-title">Location</h5>
+                                        <button class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div id="map"></div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        Footer
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script type="text/javascript">
+    var map;
+    function initMap() {
+        map = new google.maps.Map($("#map")[0], {
+            center: {lat: -34.397, lng: 150.644},
+            zoom: 8
+          });
+    }
+
+    $(".my_location").click(function (){ //user click on button
+        if ("geolocation" in navigator){
+                navigator.geolocation.getCurrentPosition(show_location, show_error, {timeout:1000, enableHighAccuracy: true}); //position request
+            }else{
+                console.log("Browser doesn't support geolocation!");
+        }
+    });
+
+    //Success Callback
+    function show_location(position){
+        var langit = ("#langit").value()
+        var latit = ("#latit").value()
+        console.log("cool")
+        infoWindow = new google.maps.InfoWindow({map: map});
+        var pos = {lat: position.coords.latit, lng: position.coords.langit};
+        infoWindow.setPosition(pos);
+        infoWindow.setContent('User Location found.');
+        map.setCenter(pos);
+    }
+
+    //Error Callback
+    function show_error(error){
+       switch(error.code) {
+            case error.PERMISSION_DENIED:
+                alert("Permission denied by user.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                alert("Location position unavailable.");
+                break;
+            case error.TIMEOUT:
+                alert("Request timeout.");
+                break;
+            case error.UNKNOWN_ERROR:
+                alert("Unknown error.");
+                break;
+        }
+    }
     </script>
-  </body>
-</html>
+   <script
+   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"
+   defer
+ ></script>
 
-<!-- [END maps_map_simple] -->
 
+
+@include('includes/footer')
