@@ -51,7 +51,10 @@
                                 <button class="btn btn-primary my_location" type="button" data-toggle="modal" data-target="#maps{{$value->fisher_id}}"><i class="fa fa-globe" aria-hidden="true"></i></button>
                             </td>
                         </tr>
-
+                        
+                        <!-- map ya leaflet itatumia div hiii ya chini ndogo  -->
+                        <div id="map"></div>
+                        
                         <div id="maps{{ $value->fisher_id }}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
@@ -130,6 +133,19 @@
    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"
    defer
  ></script>
+ 
+ <!-- hiii script ya ku run map ya leaflet -->
+ <script>
+	var map = L.map('map').setView([43.64701, -79.39425], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    L.marker([51.5, -0.09]).addTo(map)
+      .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+      .openPopup();
+</script>
 
 
 
